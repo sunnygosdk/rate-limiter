@@ -1,13 +1,24 @@
 package service
 
-import "github.com/sunnygosdk/rate-limiter/internal/infrastructure/persistence"
+import (
+	"context"
+	"time"
 
-type CacheClient struct {
-	client *persistence.CacheClient
+	"github.com/sunnygosdk/rate-limiter/internal/infrastructure/persistence"
+)
+
+type CacheRateLimiter struct {
+	client  *persistence.CacheClient
+	limit   int64
+	window  time.Duration
+	context context.Context
 }
 
-func NewCacheClient(client *persistence.CacheClient) *CacheClient {
-	return &CacheClient{
-		client: client,
+func NewCacheRateLimiter(client *persistence.CacheClient, limit int64, window time.Duration) *CacheRateLimiter {
+	return &CacheRateLimiter{
+		client:  client,
+		limit:   limit,
+		window:  window,
+		context: context.Background(),
 	}
 }
