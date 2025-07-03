@@ -3,18 +3,21 @@ package service
 import (
 	"context"
 
+	"github.com/sunnygosdk/rate-limiter/internal/infrastructure/config"
 	"github.com/sunnygosdk/rate-limiter/internal/infrastructure/persistence"
-	"github.com/sunnygosdk/rate-limiter/internal/infrastructure/shared"
 )
 
+// CacheRateLimiterClient represents a cache rate limiter client
 type CacheRateLimiterClient persistence.CacheClient
 
+// CacheRateLimiter represents a cache rate limiter
 type CacheRateLimiter struct {
 	client      CacheRateLimiterClient
 	context     context.Context
-	rateLimiter shared.RateLimiterConfig
+	rateLimiter config.RateLimiterConfig
 }
 
+// NewCacheRateLimiter creates a new cache rate limiter
 func NewCacheRateLimiter(client CacheRateLimiterClient) *CacheRateLimiter {
 	return &CacheRateLimiter{
 		client:  client,
@@ -22,8 +25,9 @@ func NewCacheRateLimiter(client CacheRateLimiterClient) *CacheRateLimiter {
 	}
 }
 
-func (rl *CacheRateLimiter) SetRateLimiterByToken(token string) bool {
-	rateLimiter := shared.GetRateLimiterByToken(token)
+// SetRateLimiterByAPIKey sets the rate limiter by API key
+func (rl *CacheRateLimiter) SetRateLimiterByAPIKey(apiKey string) bool {
+	rateLimiter := config.GetRateLimiterByAPIKey(apiKey)
 	if rateLimiter == nil {
 		return false
 	}
@@ -32,11 +36,13 @@ func (rl *CacheRateLimiter) SetRateLimiterByToken(token string) bool {
 	return true
 }
 
+// SetDefaultRateLimiter sets the default rate limiter
 func (rl *CacheRateLimiter) SetDefaultRateLimiter() bool {
-	rl.rateLimiter = shared.DefaultRateLimiter
+	rl.rateLimiter = config.DefaultRateLimiter
 	return true
 }
 
+// Allow checks if the request is allowed
 func (rl *CacheRateLimiter) Allow(key string) bool {
 	count, _ := rl.client.CheckCacheKeysOnWindow(key, rl.context, rl.rateLimiter.Window)
 	return count <= rl.rateLimiter.Limit

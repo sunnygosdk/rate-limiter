@@ -2,24 +2,29 @@ package persistence
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/sunnygosdk/rate-limiter/internal/infrastructure/config"
 )
 
+// RedisClient represents a Redis client
 type RedisClient struct {
 	client *redis.Client
 }
 
-func NewRedisClient() *RedisClient {
+// NewRedisClient creates a new Redis client
+func NewRedisClient(AppConfig *config.EnvConfig) *RedisClient {
 	redisClient := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: fmt.Sprintf(":%s", AppConfig.REDIS_PORT),
 	})
 	return &RedisClient{
 		client: redisClient,
 	}
 }
 
+// CheckCacheKeysOnWindow checks the number of requests for a given key in a given window
 func (rc *RedisClient) CheckCacheKeysOnWindow(key string, context context.Context, window time.Duration) (int64, error) {
 	pipeline := rc.client.Pipeline()
 	increment := pipeline.Incr(context, key)
@@ -33,6 +38,7 @@ func (rc *RedisClient) CheckCacheKeysOnWindow(key string, context context.Contex
 	return increment.Val(), nil
 }
 
+// CloseCacheClient closes the Redis client
 func (rc *RedisClient) CloseCacheClient() error {
 	return rc.client.Close()
 }
