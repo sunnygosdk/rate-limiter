@@ -17,7 +17,9 @@ type RedisClient struct {
 // NewRedisClient creates a new Redis client
 func NewRedisClient(AppConfig *config.EnvConfig) *RedisClient {
 	redisClient := redis.NewClient(&redis.Options{
-		Addr: fmt.Sprintf(":%s", AppConfig.REDIS_PORT),
+		Addr:     fmt.Sprintf("%s:%s", AppConfig.REDIS_HOST, AppConfig.REDIS_PORT),
+		Password: AppConfig.REDIS_PASSWORD,
+		DB:       AppConfig.REDIS_DB,
 	})
 	return &RedisClient{
 		client: redisClient,

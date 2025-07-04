@@ -38,7 +38,7 @@ func (rl *CacheRateLimiter) SetRateLimiterByAPIKey(apiKey string) bool {
 
 // SetDefaultRateLimiter sets the default rate limiter
 func (rl *CacheRateLimiter) SetDefaultRateLimiter() bool {
-	rl.rateLimiter = config.DefaultRateLimiter
+	rl.rateLimiter = *config.DefaultRateLimiter()
 	return true
 }
 

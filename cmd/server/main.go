@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/sunnygosdk/rate-limiter/internal/application/middleware"
@@ -10,17 +11,12 @@ import (
 )
 
 func main() {
-	AppConfig := config.LoadEnvConfig()
-
-	client := persistence.NewRedisClient(AppConfig)
+	client := persistence.NewRedisClient(config.AppEnvConfig)
 	defer client.CloseCacheClient()
 
-	router := http.NewServeMux()
-
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello World")
-	})
-
+	router := GetRouter()
 	handler := middleware.RateLimiterMiddleware(client, router)
-	http.ListenAndServe(fmt.Sprintf(":%s", AppConfig.APP_PORT), handler)
+
+	log.Printf("Server running on port %s", config.AppEnvConfig.APP_PORT)
+	http.ListenAndServe(fmt.Sprintf(":%s", config.AppEnvConfig.APP_PORT), handler)
 }

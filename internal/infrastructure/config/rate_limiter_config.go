@@ -2,12 +2,6 @@ package config
 
 import "time"
 
-var AppConfig *EnvConfig
-
-func init() {
-	AppConfig = GetEnvConfig()
-}
-
 // RateLimiterConfig represents the configuration for a rate limiter
 type RateLimiterConfig struct {
 	APIKey string
@@ -16,31 +10,37 @@ type RateLimiterConfig struct {
 }
 
 // DefaultRateLimiter is the default rate limiter configuration
-var DefaultRateLimiter = RateLimiterConfig{
-	APIKey: "",
-	Limit:  AppConfig.DEFAULT_LIMIT,
-	Window: 1 * time.Minute,
+func DefaultRateLimiter() *RateLimiterConfig {
+	return &RateLimiterConfig{
+		APIKey: "",
+		Limit:  AppEnvConfig.DEFAULT_LIMIT,
+		Window: time.Duration(AppEnvConfig.DEFAULT_WINDOW) * time.Second,
+	}
 }
 
 // AdminRateLimiter is the rate limiter configuration for the admin API key
-var AdminRateLimiter = RateLimiterConfig{
-	APIKey: "admin",
-	Limit:  100,
-	Window: 1 * time.Minute,
+func AdminRateLimiter() *RateLimiterConfig {
+	return &RateLimiterConfig{
+		APIKey: AppEnvConfig.ADMIN_API_KEY,
+		Limit:  AppEnvConfig.ADMIN_LIMIT,
+		Window: time.Duration(AppEnvConfig.ADMIN_WINDOW) * time.Second,
+	}
 }
 
 // TesterRateLimiter is the rate limiter configuration for the tester API key
-var TesterRateLimiter = RateLimiterConfig{
-	APIKey: "tester",
-	Limit:  50,
-	Window: 1 * time.Minute,
+func TesterRateLimiter() *RateLimiterConfig {
+	return &RateLimiterConfig{
+		APIKey: AppEnvConfig.TESTER_API_KEY,
+		Limit:  AppEnvConfig.TESTER_LIMIT,
+		Window: time.Duration(AppEnvConfig.TESTER_WINDOW) * time.Second,
+	}
 }
 
 // GetRateLimiterByAPIKey returns the rate limiter configuration for the given API key
 func GetRateLimiterByAPIKey(apiKey string) *RateLimiterConfig {
-	for _, rateLimiter := range []RateLimiterConfig{AdminRateLimiter, TesterRateLimiter} {
+	for _, rateLimiter := range []*RateLimiterConfig{AdminRateLimiter(), TesterRateLimiter()} {
 		if apiKey == rateLimiter.APIKey {
-			return &rateLimiter
+			return rateLimiter
 		}
 	}
 
