@@ -43,7 +43,10 @@ func (rl *CacheRateLimiter) SetDefaultRateLimiter() bool {
 }
 
 // Allow checks if the request is allowed
-func (rl *CacheRateLimiter) Allow(key string) bool {
-	count, _ := rl.client.CheckCacheKeysOnWindow(key, rl.context, rl.rateLimiter.Window)
-	return count <= rl.rateLimiter.Limit
+func (rl *CacheRateLimiter) Allow(key string) (bool, error) {
+	count, err := rl.client.CheckCacheKeysOnWindow(key, rl.context, rl.rateLimiter.Window)
+	if err != nil {
+		return false, err
+	}
+	return count <= rl.rateLimiter.Limit, nil
 }

@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -34,13 +35,16 @@ func (rc *RedisClient) CheckCacheKeysOnWindow(key string, context context.Contex
 
 	_, err := pipeline.Exec(context)
 	if err != nil {
+		log.Println("Error checking cache keys on window", err)
 		return 0, err
 	}
 
+	log.Println("Number of requests for key", key, "in window", window, "is", increment.Val())
 	return increment.Val(), nil
 }
 
 // CloseCacheClient closes the Redis client
 func (rc *RedisClient) CloseCacheClient() error {
+	log.Println("Closing Redis client")
 	return rc.client.Close()
 }

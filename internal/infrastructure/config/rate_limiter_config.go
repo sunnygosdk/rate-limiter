@@ -1,6 +1,9 @@
 package config
 
-import "time"
+import (
+	"log"
+	"time"
+)
 
 // RateLimiterConfig represents the configuration for a rate limiter
 type RateLimiterConfig struct {
@@ -40,9 +43,11 @@ func TesterRateLimiter() *RateLimiterConfig {
 func GetRateLimiterByAPIKey(apiKey string) *RateLimiterConfig {
 	for _, rateLimiter := range []*RateLimiterConfig{AdminRateLimiter(), TesterRateLimiter()} {
 		if apiKey == rateLimiter.APIKey {
+			log.Println("Rate limiter found for API key", apiKey)
 			return rateLimiter
 		}
 	}
 
+	log.Println("Rate limiter not found for API key", apiKey)
 	return nil
 }

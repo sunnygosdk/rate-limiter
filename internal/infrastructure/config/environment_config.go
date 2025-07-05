@@ -13,6 +13,7 @@ import (
 type EnvConfig struct {
 	APP_ENV        string
 	APP_PORT       string
+	CACHE_CLIENT   string
 	REDIS_HOST     string
 	REDIS_PORT     string
 	REDIS_PASSWORD string
@@ -36,7 +37,7 @@ func init() {
 // LoadEnvConfig loads the environment configuration
 func LoadEnvConfig() *EnvConfig {
 	env := os.Getenv("APP_ENV")
-	if env != "production" {
+	if env != "PROD" {
 
 		wd, err := os.Getwd()
 		if err != nil {
@@ -53,8 +54,9 @@ func LoadEnvConfig() *EnvConfig {
 	}
 
 	AppEnvConfig = &EnvConfig{
-		APP_ENV:        os.Getenv("APP_ENV"),
+		APP_ENV:        env,
 		APP_PORT:       os.Getenv("APP_PORT"),
+		CACHE_CLIENT:   os.Getenv("CACHE_CLIENT"),
 		REDIS_HOST:     os.Getenv("REDIS_HOST"),
 		REDIS_PORT:     os.Getenv("REDIS_PORT"),
 		REDIS_PASSWORD: os.Getenv("REDIS_PASSWORD"),
