@@ -53,7 +53,7 @@ func LoadEnvConfig() *EnvConfig {
 	}
 
 	AppEnvConfig = &EnvConfig{
-		APP_ENV:        env,
+		APP_ENV:        os.Getenv("APP_ENV"),
 		APP_PORT:       os.Getenv("APP_PORT"),
 		REDIS_HOST:     os.Getenv("REDIS_HOST"),
 		REDIS_PORT:     os.Getenv("REDIS_PORT"),
